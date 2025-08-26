@@ -18,11 +18,20 @@ function generateToken(payload){
     } catch (error) {
         throw error;
     }
-    
+}
+
+function verifyToken(token){
+    try {
+        const response = jwt.verify(token, ServerConfig.JWT_SECRET_KEY);
+        return response;
+    } catch (error) {
+        throw error;
+    }
 }
 
 
 module.exports = {
     checkPassword,
-    generateToken
+    generateToken,
+    verifyToken
 }

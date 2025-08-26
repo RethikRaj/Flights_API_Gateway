@@ -55,9 +55,35 @@ async function signIn(data){
     }
 }
 
+async function isAuthenticated(token){
+    try {
+        const response =  Auth.verifyToken(token); // response will contain the payload with which token was generated and initialized time(iat)
+        console.log(response);
+        
+        // Check if user exists -> Why ? Token may have generated before but user might have been deleted in between
+        const user = await userRepository.get(response.id);
+        if(!user){
+            throw new AppError(['User corresponding to the token do not exist'], StatusCodes.NOT_FOUND);
+        }
+        return user.id;
+    } catch (error) {
+        if(error instanceof AppError){
+            throw error;
+        }
+        if(error.name == 'JsonWebTokenError'){
+            throw new AppError(['Invalid Token'], StatusCodes.UNAUTHORIZED);
+        }
+        if(error.name == 'TokenExpiredError'){
+            throw new AppError(['Token Expired'], StatusCodes.UNAUTHORIZED);
+        }
+        throw new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 
 
 module.exports = {
     createUser,
-    signIn
+    signIn,
+    isAuthenticated
 }
