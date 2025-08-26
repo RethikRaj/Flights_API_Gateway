@@ -5,4 +5,6 @@ const router = express.Router();
 
 router.post('/signup', UserMiddlewares.validateCreateRequest, UserController.createUser);
 
+router.post('/signin', UserMiddlewares.validateSignInRequest,UserController.signIn);
+
 module.exports = router;

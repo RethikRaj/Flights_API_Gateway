@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const {UserRepository} = require('../repositories');
 const AppError = require('../utils/errors/appError');
+const { Auth } = require('../utils/common');
 
 const userRepository = new UserRepository();
 
@@ -26,6 +27,37 @@ async function createUser(data){
     }
 }
 
+async function signIn(data){
+    try {
+        const {email , password} = data;
+        // step 1 : Check if user exists
+        const user = await userRepository.getUserByEmail(email);
+        if(!user){
+            throw new AppError(['User corresponding to the email do not exist'], StatusCodes.NOT_FOUND);
+        }
+
+        // Step 2 : Check Passoword matches
+        const isPasswordmatch = await Auth.checkPassword(password, user.password);
+
+        if(!isPasswordmatch){
+            throw new AppError(['Invalid Password'], StatusCodes.UNAUTHORIZED);
+        }
+
+        // Step 3 : Generate Token
+        const token = Auth.generateToken({email : user.email, id : user.id});
+
+        return token;
+    } catch (error) {
+        if(error instanceof AppError){
+            throw error;
+        }
+        throw new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
 module.exports = {
-    createUser
+    createUser,
+    signIn
 }

@@ -1,5 +1,6 @@
 module.exports = {
     SuccessResponse : require('./successResponse'),
     ErrorResponse : require('./errorResponse'),
-    Regex : require('./regex')
+    Regex : require('./regex'),
+    Auth : require('./auth')
 }

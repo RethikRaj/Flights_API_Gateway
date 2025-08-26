@@ -13,12 +13,28 @@ async function createUser(req, res){
         SuccessResponse.data = user;
         return res.status(StatusCodes.CREATED).json(SuccessResponse);
     } catch (error) {
-        console.log(error);
+        // console.log(error);
+        ErrorResponse.error = error;
+        return res.status(error.statusCode).json(ErrorResponse);
+    }
+}
+
+async function signIn(req,res){
+    try {
+        const token = await UserService.signIn({
+            email : req.body.email,
+            password : req.body.password
+        });
+
+        SuccessResponse.data = token;
+        return res.status(StatusCodes.OK).json(SuccessResponse);
+    } catch (error) {
         ErrorResponse.error = error;
         return res.status(error.statusCode).json(ErrorResponse);
     }
 }
 
 module.exports = {
-    createUser
+    createUser,
+    signIn
 }
