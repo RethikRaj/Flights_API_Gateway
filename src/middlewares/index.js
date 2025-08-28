@@ -2,5 +2,6 @@ module.exports = {
     UserMiddlewares : require('./userMiddlewares'),
     AuthMiddlewares : require('./authMiddleware'),
     RateLimitMiddlewares : require('./rateLimitMiddleware'),
-    ProxyMiddlewares : require('./proxyMiddlewares')
+    ProxyMiddlewares : require('./proxyMiddlewares'),
+    AuthorizationMiddlewares : require('./authorizationMiddleware')
 }

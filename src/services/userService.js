@@ -3,7 +3,7 @@ const {UserRepository, RoleRepository} = require('../repositories');
 const AppError = require('../utils/errors/appError');
 const { Auth } = require('../utils/common');
 const { Enums } = require('../utils/common');
-const { CUSTOMER } = Enums.USER_ROLES;
+const { CUSTOMER, ADMIN } = Enums.USER_ROLES;
 
 const userRepository = new UserRepository();
 const roleRepository = new RoleRepository();
@@ -91,10 +91,55 @@ async function isAuthenticated(token){
     }
 }
 
+// This function should only be accessed by admin -> Using Middlewares we do this authorization
+async function setRoleToUser(data){
+    try {
+        const user = await userRepository.get(data.id);
+        if(!user){
+            throw new AppError(['User corresponding to the id do not exist'], StatusCodes.NOT_FOUND);
+        }
+        const role = await roleRepository.getByName(parseInt(data.role));
+        if(!role){
+            throw new AppError(['Role corresponding to the name do not exist'], StatusCodes.NOT_FOUND);
+        }
+        // Magic method provided by sequelize association
+        user.addRole(role);
+
+        return user;
+    } catch (error) {
+        if(error instanceof AppError){
+            throw error;
+        }
+        throw new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);   
+    }
+}
+
+async function isAdmin(id){
+    try {
+        const user = await userRepository.get(id);
+        if(!user){
+            throw new AppError(['User corresponding to the id do not exist'], StatusCodes.NOT_FOUND);
+        }
+        const adminRole = await roleRepository.getByName(ADMIN);
+        if(!adminRole){
+            throw new AppError(['Role corresponding to the name do not exist'], StatusCodes.NOT_FOUND);
+        }
+        // Magic method provided by sequelize association
+        return user.hasRole(adminRole);
+    } catch (error) {
+        if(error instanceof AppError){
+            throw error;
+        }
+        throw new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);  
+    }
+}
+
 
 
 module.exports = {
     createUser,
     signIn,
-    isAuthenticated
+    isAuthenticated,
+    setRoleToUser,
+    isAdmin
 }

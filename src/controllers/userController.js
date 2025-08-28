@@ -34,7 +34,22 @@ async function signIn(req,res){
     }
 }
 
+async function setRoleToUser(req, res){
+    try {
+        const user = await UserService.setRoleToUser({
+            id : req.body.id,
+            role : req.body.role
+        });
+        SuccessResponse.data = user;
+        return res.status(StatusCodes.OK).json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res.status(error.statusCode).json(ErrorResponse);
+    }
+}
+
 module.exports = {
     createUser,
-    signIn
+    signIn,
+    setRoleToUser
 }
