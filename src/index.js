@@ -1,7 +1,7 @@
 const express = require('express');
 const { ServerConfig , Logger} = require('./config'); // ./config/index.js == ./config
 const apiRoutes = require('./routers');
-const { RateLimitMiddlewares } = require('./middlewares');
+const { RateLimitMiddlewares, ProxyMiddlewares } = require('./middlewares');
 
 const app = express();
 
@@ -11,6 +11,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Add rate Limit
 app.use(RateLimitMiddlewares.globalRateLimiter);
+
+// Add proxy middlewares
+app.use('/flightService',ProxyMiddlewares.flightServiceProxy);
+app.use('/bookingService' ,ProxyMiddlewares.bookingServiceProxy);
 
 app.use('/api', apiRoutes);
 
