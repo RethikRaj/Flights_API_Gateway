@@ -1,3 +1,4 @@
+const { StatusCodes } = require("http-status-codes");
 const { UserService } = require("../services");
 const { ErrorResponse } = require("../utils/common");
 const AppError = require("../utils/errors/appError");
@@ -17,8 +18,12 @@ async function checkIsAuthenticated(req,res, next){
             next();
         }
     } catch (error) {
-        ErrorResponse.error = error;
-        return res.status(error.statusCode).json(ErrorResponse);
+        if(error instanceof AppError){
+            ErrorResponse.error = error;
+            return res.status(error.statusCode).json(ErrorResponse);
+        }
+        ErrorResponse.error = new AppError(['Something went wrong'], StatusCodes.INTERNAL_SERVER_ERROR);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
     }
 }
 

@@ -73,10 +73,12 @@ async function isAuthenticated(token){
         
         // Check if user exists -> Why ? Token may have generated before but user might have been deleted in between
         const user = await userRepository.get(response.id);
+        console.log(user);
         if(!user){
             throw new AppError(['User corresponding to the token do not exist'], StatusCodes.NOT_FOUND);
         }
-        return user.id;
+        const {password, ...userWithoutPassword} = user.dataValues; // removing password from user object before sending it to the user
+        return userWithoutPassword;
     } catch (error) {
         if(error instanceof AppError){
             throw error;
